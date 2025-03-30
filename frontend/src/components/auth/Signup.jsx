@@ -1,17 +1,18 @@
-import React, { useEffect, useState } from "react";
-import Navbar from "../shared/Navbar";
-import { Label } from "../ui/label";
-import { Input } from "../ui/input";
-import { RadioGroup } from "../ui/radio-group";
-import { Button } from "../ui/button";
-import { Link, useNavigate } from "react-router-dom";
+import { auth, googleProvider } from '@/./firebasse.js';
+import { setLoading } from "@/redux/authSlice";
 import { USER_API_END_POINT } from "@/utils/constant";
 import axios from "axios";
-import { toast } from "sonner";
+import { signInWithPopup } from "firebase/auth";
+import { Loader2 } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import store from "@/redux/store";
-import { setLoading } from "@/redux/authSlice";
-import { Loader2, User } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import Navbar from "../shared/Navbar";
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
+import { RadioGroup } from "../ui/radio-group";
 
 const Signup = () => {
   const [input, setInput] = useState({
@@ -72,7 +73,28 @@ const Signup = () => {
         navigate("/");
       }
   
-    },[])
+    }, [])
+  
+  const handleGoogleSignIn = async () => {
+  try {
+    const result = await signInWithPopup(auth, googleProvider);
+    console.log(result);
+
+    const token = await result.user.getIdToken();
+    
+    const response = await axios.post(`${USER_API_END_POINT}/goglesignup`, {}, {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: token, 
+      },
+    });
+
+    console.log("userData: ", response.data);
+  } catch (error) {
+    console.error("Error in signing in:", error);
+  }
+};
+
 
   return (
     <div className="bg-white min-h-screen">
@@ -89,7 +111,7 @@ const Signup = () => {
             value={input.fullname}
             name="fullname"
             onChange={changeEventHandler}
-             placeholder="Naman katiyar" />
+            placeholder="Naman katiyar" />
           </div>
           <div className="my-2">
             <Label>Email</Label>
@@ -112,7 +134,7 @@ const Signup = () => {
             value={input.password}
             name="password"
             onChange={changeEventHandler}
-             placeholder="1234.." />
+            placeholder="1234.." />
           </div>
           <div className="flex items-center justify-between">
             <RadioGroup className="flex items-center gap-4 my-5">
@@ -163,7 +185,19 @@ const Signup = () => {
             </Link>
           </span>
         </form>
+        
       </div>
+      <button
+  onClick={handleGoogleSignIn}
+  className="flex items-center justify-center gap-2 w-full bg-red-600 text-white p-3 rounded-md font-semibold hover:bg-red-700 transition-all duration-200 my-4"
+>
+  <img
+    src="/google-icon.svg"
+    alt="Google Logo"
+    className="h-5 w-5"
+  />
+  Sign in with Google
+</button>
     </div>
   );
 };

@@ -1,16 +1,18 @@
-import React, { useEffect, useState } from "react";
-import Navbar from "../shared/Navbar";
-import { Label } from "../ui/label";
-import { Input } from "../ui/input";
-import { RadioGroup } from "../ui/radio-group";
-import { Button } from "../ui/button";
-import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
-import { USER_API_END_POINT } from "@/utils/constant";
-import { toast } from "sonner";
-import { useDispatch, useSelector } from "react-redux";
-import { Loader2 } from "lucide-react";
+import { auth, googleProvider } from "@/firebasse";
 import { setLoading, setUser } from "@/redux/authSlice";
+import { USER_API_END_POINT } from "@/utils/constant";
+import axios from "axios";
+import { signInWithPopup } from "firebase/auth";
+import { Loader2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import Navbar from "../shared/Navbar";
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
+import { RadioGroup } from "../ui/radio-group";
 const Login = () => {
   const [input, setInput] = useState({
     email: "",
@@ -53,6 +55,33 @@ const Login = () => {
 
   },[])
 
+  
+const handleGoogleSignIn = async () => {
+  try {
+    const result = await signInWithPopup(auth, googleProvider);
+    console.log("Google Sign-In Result:", result);
+
+    const token = await result.user.getIdToken();
+
+    const response = await axios.post(`${USER_API_END_POINT}/goglelogin`, {}, {
+      headers: { Authorization: token },
+      withCredentials: true, 
+    });
+
+    const userData = response.data?.user;
+    console.log("User Data :", userData);
+
+    // dispatch(setUser(userData.user));
+
+    navigate("/");
+
+    toast.success("Login successful!");
+
+  } catch (error) {
+    console.error("Error in Google Sign-In:", error);
+    toast.error("Login failed. Please try again.");
+  }
+};
 
 
   return (
@@ -130,7 +159,19 @@ const Login = () => {
             </Link>
           </span>
         </form>
+        
       </div>
+      <button
+          onClick={handleGoogleSignIn}
+          className="flex items-center justify-center gap-2 w-full bg-red-600 text-white p-3 rounded-md font-semibold hover:bg-red-700 transition-all duration-200 my-4"
+        >
+          <img
+            src="/google-icon.svg"
+            alt="Google Logo"
+            className="h-5 w-5"
+          />
+          Sign in with Google
+        </button>
     </div>
   );
 };
