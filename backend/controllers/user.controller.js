@@ -1,8 +1,9 @@
-import { User } from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import getDataUri from "../utils/datauri.js";
+import admin from '../firebase.js';
+import { User } from "../models/user.model.js";
 import cloudinary from "../utils/cloudinary.js";
+import getDataUri from "../utils/datauri.js";
 export const register = async (req, res) => {
   try {
     const { fullname, email, phoneNumber, password, role } = req.body;
@@ -159,3 +160,52 @@ export const updateProfile = async (req, res) => {
     console.log(error);
   }
 };
+export const verifytoken = async (req, res, next) => {
+  try {
+    const token = req.headers.authorization; 
+    console.log('Verifying token...');
+
+    if (!token) {
+      return res.status(401).send("Unauthorized");
+    }
+
+    const decodedUser = await admin.auth().verifyIdToken(token);
+
+    req.user = decodedUser;
+    next(); 
+  } catch (error) {
+    console.error("Token verification failed:", error);
+    return res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const gogleauth = async (req, res) => {
+  try {
+    const { name, email, picture } = req.user;
+  
+    let user = User.findOne({ email });
+    if (!user) {
+      user = new User({ name, email, role: 'student' });
+      await user.save();
+    }
+    res.send(user);
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error in registering " });
+  }
+}
+
+export const goglelogin = async (req, res) => {
+  try {
+    const { name, email, picture } = req.user;
+  
+    let user = User.findOne({ email });
+    if (!user) {
+      user = new User({ name, email, role: 'student' });
+      await user.save();
+    }
+    
+    res.status(200).json({ success: true, message: "Login successful", user });
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error in registering " });
+  }
+}
