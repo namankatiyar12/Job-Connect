@@ -48,6 +48,10 @@ const CompanySetup = () => {
     }
     try {
       setLoading(true);
+
+      // console.log(params.id);
+      
+
       const res = await axios.put(
         `${COMPANY_API_END_POINT}/update/${params.id}`,
         formData,

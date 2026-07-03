@@ -108,7 +108,7 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
                 type="number"
                 value={input.phoneNumber}
                 onChange={changeEventHandler}
-                name="number" className="col-span-3" />
+                name="phoneNumber" className="col-span-3" />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="bio" className="text-right">
