@@ -1,4 +1,4 @@
-import { auth, googleProvider } from '@/./firebasse.js';
+import { auth, googleProvider } from  "../../../firebase.js";
 import { setLoading } from "@/redux/authSlice";
 import { USER_API_END_POINT } from "@/utils/constant";
 import axios from "axios";

@@ -29,10 +29,18 @@ const JobDescription = () => {
       );
       if (res.data.success) {
         setIsApplied(true); //update the local state
+
         const updatedSingleJob = {
-          ...singleJob,
-          applications: [...singleJob.application, { applicant: user?._id }],
-        }; //destructring mei kisi ek bhi change kr sakte hai
+  ...singleJob,
+  applications: [
+    ...(singleJob.applications || []),
+    { applicant: user?._id },
+  ],
+};
+        // const updatedSingleJob = {
+        //   ...singleJob,
+        //   applications: [...singleJob.application, { applicant: user?._id }],
+        // }; //destructring mei kisi ek bhi change kr sakte hai
         dispatch(setSingleJob(updatedSingleJob)); //real time ui update
         toast.success(res.data.message);
       }
@@ -119,7 +127,7 @@ const JobDescription = () => {
         <h1 className="font-bold my-1">
           Experience:
           <span className="pl-4 font-normal text-gray-800">
-            {singleJob?.experence}yrs
+            {singleJob?.experienceLevel } yrs
           </span>
         </h1>
         <h1 className="font-bold my-1">

@@ -1,9 +1,8 @@
-import admin from 'firebase-admin';
-import serviceAccount from './jobconnect-e95b7-firebase-adminsdk-fbsvc-60e88ad184.json' assert { type: "json" };
+import { initializeApp, cert } from "firebase-admin/app";
+import serviceAccount from "./jobconnect-5b855-firebase-adminsdk-fbsvc-1aaabd9efd.json" with { type: "json" };
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
+const app = initializeApp({
+  credential: cert(serviceAccount),
 });
 
-
-export default admin;
+export default app;
