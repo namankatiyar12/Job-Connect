@@ -9,12 +9,22 @@ const useGetAllCompanies = () => {
   useEffect(() => {
     const fetchCompanies = async () => {
       try {
+        // const res = await axios.get(`${COMPANY_API_END_POINT}/get`, {
+        //   withCredentials: true,
+        // });
+        // if (res.data.success) {
+        //   dispatch(setCompanies(res.data.companies));
+        // }
+
         const res = await axios.get(`${COMPANY_API_END_POINT}/get`, {
-          withCredentials: true,
-        });
-        if (res.data.success) {
-          dispatch(setCompanies(res.data.companies));
-        }
+  withCredentials: true,
+});
+
+console.log("API Response:", res.data);
+
+if (res.data.success) {
+  dispatch(setCompanies(res.data.companies));
+}
       } catch (error) {
         console.log(error);
       }

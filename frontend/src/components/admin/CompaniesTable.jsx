@@ -16,25 +16,49 @@ import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 const CompaniesTable = () => {
+ 
   const { companies, searchCompanyByText } = useSelector(
     (store) => store.company
   );
   const [filterCompany, setFilterCompany] = useState(companies);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const filteredCompany =
-      companies.length >= 0 &&
-      companies.filter((company) => {
-        if (!searchCompanyByText) {
-          return true;
-        }
-        return company?.name
-          ?.toLowerCase()
-          .includes(searchCompanyByText.toLowerCase());
-      });
-    setFilterCompany(filteredCompany);
-  }, [companies, searchCompanyByText]);
+//   useEffect(() => {
+//     const filteredCompany =
+//       companies.length >= 0 &&
+//       companies.filter((company) => {
+//         if (!searchCompanyByText) {
+//           return true;
+//         }
+//         return company?.name
+//           ?.toLowerCase()
+//           .includes(searchCompanyByText.toLowerCase());
+//       });
+//     setFilterCompany(filteredCompany);
+//      companies.forEach(company => {
+//   console.log(company._id, company.name);
+// });
+//   }, [companies, searchCompanyByText]);
+
+
+useEffect(() => {
+  console.log("Companies from Redux:", companies);
+
+  companies.forEach(company => {
+    console.log("ID:", company._id);
+    console.log("Name:", company.name);
+  });
+
+  const filteredCompany = companies.filter((company) => {
+    if (!searchCompanyByText) return true;
+
+    return company.name
+      .toLowerCase()
+      .includes(searchCompanyByText.toLowerCase());
+  });
+
+  setFilterCompany(filteredCompany);
+}, [companies, searchCompanyByText]);
 
   return (
     <div>
@@ -65,9 +89,10 @@ const CompaniesTable = () => {
                   </PopoverTrigger>
                   <PopoverContent className="w-32">
                     <div
-                      onClick={() =>
-                        navigate(`/admin/companies/${company._id}`)
-                      }
+                      onClick={() => {
+    console.log("Clicked:", company._id);
+    navigate(`/admin/companies/${company._id}`);
+}}
                       className="flex items-center justify-between"
                     >
                       <Edit2 className="w-4" />

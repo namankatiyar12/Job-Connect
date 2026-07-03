@@ -1,6 +1,8 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import admin from '../firebase.js';
+// import admin from '../firebase.js';
+import "../firebase.js";
+import { getAuth } from "firebase-admin/auth";
 import { User } from "../models/user.model.js";
 import cloudinary from "../utils/cloudinary.js";
 import getDataUri from "../utils/datauri.js";
@@ -42,6 +44,8 @@ export const register = async (req, res) => {
 
 export const login = async (req, res) => {
   try {
+    // console.log(req.body);
+    // console.log(error.response?.data);
     const { email, password, role } = req.body;
     if (!email || !password || !role) {
       return res
@@ -85,12 +89,12 @@ export const login = async (req, res) => {
     return res
       .status(200)
       .cookie("token", token, {
-        maxage: 1 * 24 * 60 * 60 * 1000,
-        httpsOly: true,
-        sameSite: "strict",
-      })
+    maxAge: 1 * 24 * 60 * 60 * 1000,
+    httpOnly: true,
+    sameSite: "strict",
+})
       .json({
-        message: `Welcome back${user.fullname}`,
+        message: `Welcome back  ${user.fullname}`,
         user,
         success: true,
       });
@@ -111,53 +115,53 @@ export const logout = async (req, res) => {
 export const updateProfile = async (req, res) => {
   try {
     const { fullname, email, phoneNumber, bio, skills } = req.body;
-    const file = req.file;
-    if (file) {
-      const fileUri = getDataUri(file);
-      const cloudResponse = await cloudinary.uploader.upload(fileUri.content);
-      user.profile.resume = cloudResponse.secure_url;
-      user.profile.resumeOriginalName = file.originalname;
-    }
 
-    //cloudinary aayega idhar
+    const userId = req.id;
+
+    let user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(400).json({
+        message: "User does not exist",
+        success: false,
+      });
+    }
 
     let skillsArray;
     if (skills) {
       skillsArray = skills.split(",");
     }
-    const userId = req.id; //middleware authentication
-    let user = await User.findById(userId);
-    if (!user) {
-      return res
-        .status(400)
-        .json({ message: "User does not exist", success: false });
-    }
-    if (fullname) {
-      user.fullname = fullname;
-    }
-    if (email) {
-      user.email = email;
-    }
-    if (phoneNumber) {
-      user.phoneNumber = phoneNumber;
-    }
-    if (bio) {
-      user.profile.bio = bio;
-    }
-    if (skills) {
-      user.profile.skills = skillsArray;
+
+    const file = req.file;
+
+    if (file) {
+      const fileUri = getDataUri(file);
+      const cloudResponse = await cloudinary.uploader.upload(fileUri.content);
+
+      user.profile.resume = cloudResponse.secure_url;
+      user.profile.resumeOriginalName = file.originalname;
     }
 
-    //resume section
+    if (fullname) user.fullname = fullname;
+    if (email) user.email = email;
+    if (phoneNumber) user.phoneNumber = phoneNumber;
+    if (bio) user.profile.bio = bio;
+    if (skills) user.profile.skills = skillsArray;
 
     await user.save();
+
     return res.status(200).json({
       message: "Profile updated successfully",
       user,
       success: true,
     });
+
   } catch (error) {
     console.log(error);
+    return res.status(500).json({
+      message: "Internal Server Error",
+      success: false,
+    });
   }
 };
 export const verifytoken = async (req, res, next) => {
@@ -169,8 +173,8 @@ export const verifytoken = async (req, res, next) => {
       return res.status(401).send("Unauthorized");
     }
 
-    const decodedUser = await admin.auth().verifyIdToken(token);
-
+    // const decodedUser = await admin.auth().verifyIdToken(token);
+const decodedUser = await getAuth().verifyIdToken(token);
     req.user = decodedUser;
     next(); 
   } catch (error) {
@@ -183,7 +187,7 @@ export const gogleauth = async (req, res) => {
   try {
     const { name, email, picture } = req.user;
   
-    let user = User.findOne({ email });
+    let user =await User.findOne({ email });
     if (!user) {
       user = new User({ name, email, role: 'student' });
       await user.save();

@@ -20,6 +20,10 @@ const AdminJobsTable = () => {
   const [filterJobs, setFilterJobs] = useState(allAdminJobs);
   const navigate = useNavigate();
 
+  console.log(allAdminJobs);
+
+
+
   useEffect(() => {
     const filteredJobs =
       allAdminJobs.length >= 0 &&
@@ -63,7 +67,17 @@ const AdminJobsTable = () => {
                   </PopoverTrigger>
                   <PopoverContent className="w-32">
                     <div
-                      onClick={() => navigate(`/admin/companies/${job._id}`)}
+    onClick={() => {
+  console.log("Job:", job);
+  console.log("Job ID:", job._id);
+  console.log("Company Object:", job.company);
+  console.log("Company ID:", job.company._id);
+
+  const url = `/admin/companies/${job.company._id}`;
+  console.log("Navigate URL:", url);
+
+  navigate(url);
+}}
                       className="flex items-center justify-between"
                     >
                       <Edit2 className="w-4" />
