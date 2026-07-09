@@ -6,6 +6,7 @@ import { getAuth } from "firebase-admin/auth";
 import { User } from "../models/user.model.js";
 import cloudinary from "../utils/cloudinary.js";
 import getDataUri from "../utils/datauri.js";
+// import jwt from "jsonwebtoken";
 export const register = async (req, res) => {
   try {
     const { fullname, email, phoneNumber, password, role } = req.body;
@@ -166,7 +167,17 @@ export const updateProfile = async (req, res) => {
 };
 export const verifytoken = async (req, res, next) => {
   try {
-    const token = req.headers.authorization; 
+    // const token = req.headers.authorization; 
+    const authHeader = req.headers.authorization;
+
+if (!authHeader) {
+    return res.status(401).json({
+        success: false,
+        message: "Unauthorized"
+    });
+}
+
+const token = authHeader.split(" ")[1];
     console.log('Verifying token...');
 
     if (!token) {
@@ -198,18 +209,74 @@ export const gogleauth = async (req, res) => {
   }
 }
 
+// export const goglelogin = async (req, res) => {
+//   try {
+//     const { name, email, picture } = req.user;
+  
+//     let user = await User.findOne({ email });
+//     if (!user) {
+//       user = new User({ name, email, role: 'student' });
+//       await user.save();
+//     }
+    
+//     res.status(200).json({ success: true, message: "Login successful", user });
+//   } catch (error) {
+//     res.status(500).json({ message: "Internal server error in registering " });
+//   }
+// }
+
+
+
 export const goglelogin = async (req, res) => {
   try {
+
+     console.log("Firebase User:");
+    console.log(req.user);
     const { name, email, picture } = req.user;
-  
-    let user = User.findOne({ email });
+
+    let user = await User.findOne({ email });
+
     if (!user) {
-      user = new User({ name, email, role: 'student' });
-      await user.save();
+      user = await User.create({
+        fullname: name,
+        email,
+        role: "student",
+        profile: {
+          profilePhoto: picture,
+        },
+      });
+
+      console.log("Created User:");
+console.log(user);
     }
-    
-    res.status(200).json({ success: true, message: "Login successful", user });
+
+    // Create JWT token
+    const token = jwt.sign(
+      { userId: user._id },
+      process.env.SECRET_KEY,
+      { expiresIn: "1d" }
+    );
+
+    // Send JWT as cookie
+    return res
+      .cookie("token", token, {
+        maxAge: 24 * 60 * 60 * 1000,
+        httpOnly: true,
+        sameSite: "lax",
+        secure: false, // localhost only
+      })
+      .status(200)
+      .json({
+        success: true,
+        message: "Login successful",
+        user,
+      });
+
   } catch (error) {
-    res.status(500).json({ message: "Internal server error in registering " });
+    console.log(error);
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
-}
+};

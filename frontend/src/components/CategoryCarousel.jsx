@@ -17,6 +17,8 @@ const category = [
   "Data Science",
   "Graphic Designer",
   "FullStack Developer",
+  "Data Scientist",
+  "AI/ML Developer"
 ];
 const CategoryCarousel = () => {
   const dispatch=useDispatch();

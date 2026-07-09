@@ -7,16 +7,25 @@ import { setSearchedQuery } from '@/redux/jobSlice'
 const filterData=[
   {
     filterType:"Location",
-    array:["DelhiNcr","Banglore","Hydrabad","Pune","Mumbai"]
+    array:["DelhiNcr","Bangalore","Hyderabad","Pune","Mumbai","Delhi","Chennai","Kolkata","Jaipur","Lucknow"]
   },
   {
     filterType:"Industry",
-    array:["Frontend Developer","Backend Developer","FullStack Developer","Data Scientist"]
+    array:["Frontend Developer","Backend Developer","FullStack Developer","Data Scientist","AI/ML Engineer","DevOps Engineer","Mobile App Developer","UI/UX Designer","Cybersecurity Specialist","Cloud Solutions Architect"]
   },
   {
-    filterType:"Salary",
-    array:["0-40k","42-1lakh","1 lakh to 5lakh","5lakh to 10lakh","10lakh to 20lakh"]
-  },
+  filterType: "Salary",
+  array: [
+    "1-5 LPA",
+    "5-10 LPA",
+    "10-20 LPA",
+    "20-30 LPA",
+    "30-40 LPA",
+    "40-50 LPA",
+    "50-60 LPA"
+    
+  ]
+}
 ]
 
 const FilterCard = () => {

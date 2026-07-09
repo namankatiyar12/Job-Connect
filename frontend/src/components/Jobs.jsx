@@ -10,23 +10,79 @@ const Jobs = () => {
   const [filterJobs , setFilterJobs]=useState(allJobs);
 
 
-  useEffect(()=>{
-    if(searchedQuery){
-      const filteredJobs=allJobs.filter((job)=>{
-        return job.title.toLowerCase().includes(searchedQuery.toLowerCase())||
-        job.description.toLowerCase().includes(searchedQuery.toLowerCase())||
-        job.location.toLowerCase().includes(searchedQuery.toLowerCase())
+  // useEffect(()=>{
+  //   if(searchedQuery){
+  //     const filteredJobs=allJobs.filter((job)=>{
+  //       return job.title.toLowerCase().includes(searchedQuery.toLowerCase())||
+  //       job.description.toLowerCase().includes(searchedQuery.toLowerCase())||
+  //       job.location.toLowerCase().includes(searchedQuery.toLowerCase())
 
-      })
-      setFilterJobs(filteredJobs)
+  //     })
+  //     setFilterJobs(filteredJobs)
 
-    }
-    else{
-      setFilterJobs(allJobs)
-    }
+  //   }
+  //   else{
+  //     setFilterJobs(allJobs)
+  //   }
 
 
-  },[allJobs,searchedQuery]);
+  // },[allJobs,searchedQuery]);
+
+  useEffect(() => {
+  if (searchedQuery) {
+    const filteredJobs = allJobs.filter((job) => {
+      const query = searchedQuery.toLowerCase();
+      const salary = Number(job.salary);
+
+      // Title
+      if (job.title.toLowerCase().includes(query)) return true;
+
+      // Description
+      if (job.description.toLowerCase().includes(query)) return true;
+
+      // Location
+      if (job.location.toLowerCase().includes(query)) return true;
+
+      // Industry (optional)
+      if (job.title.toLowerCase().includes(query)) return true;
+
+      // Salary
+      // Salary
+if (query === "1-5 lpa") {
+  return salary >= 1 && salary <= 5;
+}
+
+if (query === "5-10 lpa") {
+  return salary > 5 && salary <= 10;
+}
+
+if (query === "10-20 lpa") {
+  return salary > 10 && salary <= 20;
+}
+
+if (query === "20-30 lpa") {
+  return salary > 20 && salary <= 30;
+}
+
+if (query === "30-40 lpa") {
+  return salary > 30 && salary <= 40;
+}
+
+if (query === "40-50 lpa") {
+  return salary > 40 && salary <= 50;
+}
+
+if (query === "50-60 lpa") {
+  return salary > 50 && salary <= 60;
+}
+      return false;
+    });
+
+    setFilterJobs(filteredJobs);
+  } else {
+    setFilterJobs(allJobs);
+  }
+}, [allJobs, searchedQuery]);
   return (
     <div>
       <Navbar />

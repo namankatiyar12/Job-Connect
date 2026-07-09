@@ -85,6 +85,93 @@ const PostJob = () => {
         >
           <div className="grid grid-cols-2 gap-2">
             <div>
+  <Label>Title</Label>
+  <Input
+    type="text"
+    name="title"
+    placeholder="e.g. Full Stack Developer"
+    value={input.title}
+    onChange={changeEventHandler}
+  />
+</div>
+
+<div>
+  <Label>Description</Label>
+  <Input
+    type="text"
+    name="description"
+    placeholder="Briefly describe the job role and responsibilities"
+    value={input.description}
+    onChange={changeEventHandler}
+  />
+</div>
+
+<div>
+  <Label>Requirements</Label>
+  <Input
+    type="text"
+    name="requirements"
+    placeholder="e.g. React.js, Node.js, MongoDB"
+    value={input.requirements}
+    onChange={changeEventHandler}
+  />
+</div>
+
+<div>
+  <Label>Salary (LPA)</Label>
+  <Input
+    type="number"
+    name="salary"
+    placeholder="e.g. 6, 8, 12"
+    value={input.salary}
+    onChange={changeEventHandler}
+  />
+</div>
+
+<div>
+  <Label>Location</Label>
+  <Input
+    type="text"
+    name="location"
+    placeholder="e.g. Bangalore"
+    value={input.location}
+    onChange={changeEventHandler}
+  />
+</div>
+
+<div>
+  <Label>Job Type</Label>
+  <Input
+    type="text"
+    name="jobType"
+    placeholder="e.g. Full-time, Internship"
+    value={input.jobType}
+    onChange={changeEventHandler}
+  />
+</div>
+
+<div>
+  <Label>Experience Level</Label>
+  <Input
+    type="number"
+    name="experienceLevel"
+    placeholder="e.g. 2"
+    value={input.experienceLevel}
+    onChange={changeEventHandler}
+  />
+</div>
+
+<div>
+  <Label>No of Positions</Label>
+  <Input
+    type="number"
+    name="position"
+    placeholder="e.g. 5"
+    value={input.position}
+    onChange={changeEventHandler}
+  />
+</div>
+            {/* <div>
               <Label>Title</Label>
               <Input
                 type="text"
@@ -115,9 +202,9 @@ const PostJob = () => {
                 onChange={changeEventHandler}
                 className="focus-visible:ring-offset-0 focus-visible:ring-0 my-1"
               />
-            </div>
+            </div> */}
 
-            <div>
+            {/* <div>
               <Label>Salary</Label>
               <Input
                 type="text"
@@ -126,9 +213,11 @@ const PostJob = () => {
                 onChange={changeEventHandler}
                 className="focus-visible:ring-offset-0 focus-visible:ring-0 my-1"
               />
-            </div>
+            </div> */}
 
-            <div>
+          
+
+            {/* <div>
               <Label>Location</Label>
               <Input
                 type="text"
@@ -170,7 +259,7 @@ const PostJob = () => {
                 onChange={changeEventHandler}
                 className="focus-visible:ring-offset-0 focus-visible:ring-0 my-1"
               />
-            </div>
+            </div> */}
             {companies.length > 0 && (
               <Select onValueChange={selectChangeHandler}>
                 <SelectTrigger className="w-[180px]">

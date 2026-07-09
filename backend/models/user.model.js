@@ -9,14 +9,26 @@ const userSchema=new mongoose.Schema({
         required:true,
         unique:true
     },
-    phoneNumber:{
-        type:Number,
-        required:true
-    },
-    password:{
-        type:String,
-        required:true
-    },
+    phoneNumber: {
+    type:Number,
+    required:false,
+    default:null
+},
+
+password:{
+    type:String,
+    required:false,
+    default:null
+},
+    // phoneNumber:{
+    //     type:Number,
+    //     required:true
+    // },
+    // password:{
+    //     type:String,
+    //     required:true
+    // },
+
     role:{
         type:String,
         enum:['student','recruiter'],

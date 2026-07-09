@@ -65,19 +65,40 @@ const handleGoogleSignIn = async () => {
 
     const token = await result.user.getIdToken();
 
-    const response = await axios.post(`${USER_API_END_POINT}/goglelogin`, {}, {
-      headers: { Authorization: token },
-      withCredentials: true, 
-    });
+    // const response = await axios.post(`${USER_API_END_POINT}/goglelogin`, {}, {
+    //   headers: { Authorization: token },
+    //   withCredentials: true, 
+    // });
 
-    const userData = response.data?.user;
-    console.log("User Data :", userData);
+    const response = await axios.post(
+  `${USER_API_END_POINT}/goglelogin`,
+  {},
+  {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    withCredentials: true,
+  }
+);
 
-    // dispatch(setUser(userData.user));
+    // const userData = response.data?.user;
+    // console.log("User Data :", userData);
 
-    navigate("/");
+    // // dispatch(setUser(userData.user));
 
-    toast.success("Login successful!");
+    // navigate("/");
+
+    // toast.success("Login successful!");
+
+    const userData = response.data.user;
+// console.log("User Data:", userData);
+console.log("Profile Photo:", userData.profile?.profilePhoto);
+console.log(userData);
+dispatch(setUser(userData));   // ✅ Save user in Redux
+
+navigate("/");
+
+toast.success("Login successful!");
 
   } catch (error) {
     console.error("Error in Google Sign-In:", error);

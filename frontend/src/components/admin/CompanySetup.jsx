@@ -101,7 +101,7 @@ const CompanySetup = () => {
             <h1>Company set up</h1>
           </div>
           <div className="grid grid-cols-2 gap-4 ">
-            <div>
+            {/* <div>
               <Label>Company Name</Label>
               <Input
                 type="text"
@@ -144,7 +144,62 @@ const CompanySetup = () => {
                 accept="image/*"
                 onChange={changeFileHandler}
               />
-            </div>
+            </div> */}
+
+            <div>
+  <Label>Company Name</Label>
+  <Input
+    type="text"
+    name="name"
+    placeholder="e.g. Deutsche Bank"
+    value={input.name}
+    onChange={changeEventHandler}
+  />
+</div>
+
+<div>
+  <Label>Description</Label>
+  <Input
+    type="text"
+    name="description"
+    placeholder="e.g. Global financial services company specializing in banking and investment."
+    value={input.description}
+    onChange={changeEventHandler}
+  />
+</div>
+
+<div>
+  <Label>Website</Label>
+  <Input
+    type="text"
+    name="website"
+    placeholder="e.g. https://www.db.com"
+    value={input.website}
+    onChange={changeEventHandler}
+  />
+</div>
+
+<div>
+  <Label>Location</Label>
+  <Input
+    type="text"
+    name="location"
+    placeholder="e.g. Mumbai, India"
+    value={input.location}
+    onChange={changeEventHandler}
+  />
+</div>
+
+<div>
+  <Label>Logo</Label>
+  <Input
+    type="file"
+    accept="image/*"
+    onChange={changeFileHandler}
+  />
+</div>
+
+
           </div>
           {loading ? (
             <Button className="w-full bg-black text-white  my-4">
