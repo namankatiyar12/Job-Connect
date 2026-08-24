@@ -1,22 +1,26 @@
-import React from "react";
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "../ui/table";
+import { APPLICATION_API_END_POINT } from "@/utils/constant";
 import { Popover, PopoverTrigger } from "@radix-ui/react-popover";
+import axios from "axios";
 import { MoreHorizontal } from "lucide-react";
 import { useSelector } from "react-redux";
 import { toast } from "sonner";
-import axios from "axios";
-import { APPLICATION_API_END_POINT } from "@/utils/constant";
 import { PopoverContent } from "../ui/popover";
+import {
+    Table,
+    TableBody,
+    TableCaption,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "../ui/table";
 
 const shortlistingStatus = ["Accepted", "Rejected"];
+const getScoreStyle = (score) => {
+  if (score >= 70) return "bg-emerald-100 text-emerald-700";
+  if (score >= 40) return "bg-amber-100 text-amber-700";
+  return "bg-rose-100 text-rose-700";
+};
 const ApplicantsTable = () => {
   const { applicants } = useSelector((store) => store.application);
 
@@ -48,6 +52,7 @@ const ApplicantsTable = () => {
             <TableHead>Email</TableHead>
 
             <TableHead>Contact</TableHead>
+            <TableHead>ATS match</TableHead>
             <TableHead>Resume</TableHead>
             <TableHead>Date</TableHead>
             <TableHead className="text-right">Action</TableHead>
@@ -61,6 +66,17 @@ const ApplicantsTable = () => {
                 <TableCell>{item?.applicant?.fullname}</TableCell>
                 <TableCell>{item?.applicant?.email}</TableCell>
                 <TableCell>{item?.applicant?.phoneNumber}</TableCell>
+                <TableCell>
+                  <div className="group relative w-fit">
+                    <span className={`rounded-full px-3 py-1 text-xs font-bold ${getScoreStyle(item?.atsScore?.score || 0)}`}>
+                      {item?.atsScore?.score || 0}%
+                    </span>
+                    <div className="pointer-events-none absolute bottom-full left-0 z-10 mb-2 hidden w-64 rounded-lg border bg-white p-3 text-xs text-slate-600 shadow-xl group-hover:block dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300">
+                      <strong className="text-slate-900 dark:text-white">Matched skills:</strong> {item?.atsScore?.matchedKeywords?.join(", ") || "No matches yet"}
+                      {item?.atsScore?.missingKeywords?.length > 0 && <><br /><strong className="text-slate-900 dark:text-white">Missing keywords:</strong> {item.atsScore.missingKeywords.join(", ")}</>}
+                    </div>
+                  </div>
+                </TableCell>
                 <TableCell>
                   {item.applicant?.profile?.resume ? (
                     <a

@@ -1,5 +1,6 @@
 import { Application } from "../models/application.model.js";
 import { Job } from "../models/job.model.js";
+import { calculateAtsScore } from "../utils/atsScore.js";
 
 
 export const applyJob=async (req,res)=>{
@@ -82,6 +83,10 @@ export const getApplicants=async (req,res)=>{
                 success:false
                 });
         }
+            job.applications = job.applications.map((application) => {
+                application.atsScore = calculateAtsScore(job, application.applicant);
+                return application;
+            });
         return res.status(200).json({
             success:true,
             job
