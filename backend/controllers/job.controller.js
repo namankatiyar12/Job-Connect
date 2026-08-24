@@ -61,6 +61,8 @@ export const getAllJobs = async (req, res) => {
       $or: [
         { title: { $regex: escapedKeyword, $options: "i" } },
         { description: { $regex: escapedKeyword, $options: "i" } },
+        { location: { $regex: escapedKeyword, $options: "i" } },
+        { requirements: { $regex: escapedKeyword, $options: "i" } },
       ],
     };
     const jobs = await Job.find(query)
