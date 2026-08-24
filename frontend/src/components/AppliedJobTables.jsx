@@ -1,16 +1,14 @@
-import React from "react";
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "./ui/table";
-import { Badge } from "./ui/badge";
 import { useSelector } from "react-redux";
-import store from "@/redux/store";
+import { Badge } from "./ui/badge";
+import {
+    Table,
+    TableBody,
+    TableCaption,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "./ui/table";
 
 const AppliedJobTables = () => {
   const { allAppliedJobs } = useSelector((store) => store.job);
@@ -28,7 +26,7 @@ const AppliedJobTables = () => {
         </TableHeader>
         <TableBody>
           {allAppliedJobs?.length == 0 ? (
-            <TableRow>You haven't applied any job yet.</TableRow>
+            <TableRow><TableCell colSpan={4} className="py-8 text-center text-slate-500">You have not applied to any job yet.</TableCell></TableRow>
           ) : (
             allAppliedJobs?.map((appliedJob) => (
               <TableRow key={appliedJob?._id}>

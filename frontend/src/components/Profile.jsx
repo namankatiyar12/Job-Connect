@@ -1,17 +1,16 @@
-import React, { useState } from "react";
+import useGetAppliedJobs from "@/hooks/useGetAppliedJobs";
+import { Contact, Mail, Pen } from "lucide-react";
+import { useState } from "react";
+import { useSelector } from "react-redux";
+import AppliedJobTables from "./AppliedJobTables";
 import Navbar from "./shared/Navbar";
 import { Avatar, AvatarImage } from "./ui/avatar";
-import { Button } from "./ui/button";
-import {  Contact, Mail, Pen } from "lucide-react";
 import { Badge } from "./ui/badge";
+import { Button } from "./ui/button";
 import { Label } from "./ui/label";
-import AppliedJobTables from "./AppliedJobTables";
 import UpdateProfileDialog from "./UpdateProfileDialog";
-import { useSelector } from "react-redux";
-import useGetAppliedJobs from "@/hooks/useGetAppliedJobs";
 // const skills=["Html","Css","Javascript","Reactjs"];
-const isResume=true;
-const profile = () => {
+const Profile = () => {
   useGetAppliedJobs();
 const [open,setOpen]=useState(false);
     const {user}=useSelector(store=>store.auth);
@@ -50,7 +49,7 @@ const [open,setOpen]=useState(false);
             <h1>Skills</h1>
             <div className="flex items-center gap-1"></div>
             {
-                user?.profile?.skills.length!=0?user?.profile?.skills.map((item,index)=><Badge key={index} className="bg-black text-white"> {item}</Badge>):<span>NA</span>
+                user?.profile?.skills?.length?user.profile.skills.map((item,index)=><Badge key={index} className="bg-black text-white"> {item}</Badge>):<span>NA</span>
             }
         </div>
         <div className="grid w-full max-w-sm items-center gap-1.5">
@@ -58,7 +57,7 @@ const [open,setOpen]=useState(false);
             
             {
               
-                isResume?<a target='_blank' href={user?.profile?.resume}
+                user?.profile?.resume?<a target='_blank' href={user?.profile?.resume}
                    className="text-blue-500 w-full hover:underline cursor-pointer">{user?.profile?.resumeOriginalName}</a>:<span>NA</span>
                 
             }
@@ -75,4 +74,4 @@ const [open,setOpen]=useState(false);
   );
 };
 
-export default profile;
+export default Profile;

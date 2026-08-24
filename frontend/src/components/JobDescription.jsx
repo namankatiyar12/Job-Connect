@@ -14,15 +14,25 @@ const JobDescription = () => {
 
   const isInitiallyApplied =
     singleJob?.applications?.some(
-      (application) => application.applicant == user?._id
+      (application) => String(application.applicant?._id || application.applicant) === String(user?._id)
     ) || false;
   const [isApplied, setIsApplied] = useState(isInitiallyApplied);
+  const [isApplying, setIsApplying] = useState(false);
   const params = useParams();
   const jobId = params.id;
   const dispatch = useDispatch();
 
   const applyJobHandler = async () => {
+    if (!user) {
+      toast.error("Please sign in to apply for this job");
+      return;
+    }
+    if (user.role !== "student") {
+      toast.error("Only student accounts can apply for jobs");
+      return;
+    }
     try {
+      setIsApplying(true);
       const res = await axios.get(
         `${APPLICATION_API_END_POINT}/apply/${jobId}`,
         { withCredentials: true }
@@ -38,7 +48,9 @@ const JobDescription = () => {
       }
     } catch (error) {
       console.log(error);
-      toast.error(error.message);
+      toast.error(error.response?.data?.message || "Unable to apply for this job");
+    } finally {
+      setIsApplying(false);
     }
   };
 
@@ -53,7 +65,7 @@ const JobDescription = () => {
           dispatch(setSingleJob(res.data.job));
           setIsApplied(
             res.data.job.applications.some(
-              (application) => application.applicant == user?._id
+              (application) => String(application.applicant?._id || application.applicant) === String(user?._id)
             )
           ); //ensure that state is sync with fetch data
         }
@@ -83,7 +95,7 @@ const JobDescription = () => {
         </div>
         <Button
           onClick={isApplied ? null : applyJobHandler}
-          disabled={isApplied}
+          disabled={isApplied || isApplying}
           variant="outline"
           className={`rounded-lg ${
             isApplied
@@ -91,7 +103,7 @@ const JobDescription = () => {
               : "text-green-400 bg-blue-600"
           }`}
         >
-          {isApplied ? "Already applied" : "Apply Now"}
+          {isApplying ? "Applying..." : isApplied ? "Already applied" : "Apply Now"}
         </Button>
       </div>
       <h1 className="border-b-2 border-b-gray-300 font-medium py-4">

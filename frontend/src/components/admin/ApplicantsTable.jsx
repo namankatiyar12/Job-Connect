@@ -1,9 +1,10 @@
+import { setAllApplicants } from "@/redux/applicationSlice";
 import { APPLICATION_API_END_POINT } from "@/utils/constant";
 import { Popover, PopoverTrigger } from "@radix-ui/react-popover";
 import axios from "axios";
 import { MoreHorizontal, Search, SlidersHorizontal } from "lucide-react";
 import { useMemo, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
 import { PopoverContent } from "../ui/popover";
 import {
@@ -24,6 +25,7 @@ const getScoreStyle = (score) => {
 };
 const ApplicantsTable = () => {
   const { applicants } = useSelector((store) => store.application);
+  const dispatch = useDispatch();
   const [search, setSearch] = useState("");
   const [resumeFilter, setResumeFilter] = useState("all");
   const [minimumScore, setMinimumScore] = useState("0");
@@ -57,6 +59,10 @@ const ApplicantsTable = () => {
       );
       console.log(res);
       if (res.data.success) {
+        dispatch(setAllApplicants({
+          ...applicants,
+          applications: applicants.applications.map((application) => application._id === id ? { ...application, status: status.toLowerCase() } : application),
+        }));
         toast.success(res.data.message);
       }
     } catch (error) {
