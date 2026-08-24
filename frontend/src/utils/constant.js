@@ -1,10 +1,11 @@
-// export const USER_API_END_POINT="http://localhost:8000/api/v1/user"; 
-// export const JOB_API_END_POINT="http://localhost:8000/api/v1/job";
-// export const APPLICATION_API_END_POINT="http://localhost:8000/api/v1/application";
-// export const COMPANY_API_END_POINT="http://localhost:8000/api/v1/company"; 
+import axios from "axios";
 
+const apiBaseUrl = import.meta.env.VITE_API_URL || "http://localhost:8000";
+const apiRoot = `${apiBaseUrl.replace(/\/$/, "")}/api/v1`;
 
-export const USER_API_END_POINT="https://job-connect-bdqa.onrender.com/api/v1/user"; 
-export const JOB_API_END_POINT="https://job-connect-bdqa.onrender.com/api/v1/job";
-export const APPLICATION_API_END_POINT="https://job-connect-bdqa.onrender.com/api/v1/application";
-export const COMPANY_API_END_POINT="https://job-connect-bdqa.onrender.com/api/v1/company"; 
+axios.defaults.timeout = 15000;
+
+export const USER_API_END_POINT = `${apiRoot}/user`;
+export const JOB_API_END_POINT = `${apiRoot}/job`;
+export const APPLICATION_API_END_POINT = `${apiRoot}/application`;
+export const COMPANY_API_END_POINT = `${apiRoot}/company`;

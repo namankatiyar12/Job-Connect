@@ -38,7 +38,7 @@ export const applyJob=async (req,res)=>{
         });
 
     }catch(error){
-        console.log(error);
+        return res.status(500).json({message:"Unable to apply for this job", success:false});
     }
 }
 export const getAppliedJobs=async(req,res)=>{
@@ -51,7 +51,7 @@ export const getAppliedJobs=async(req,res)=>{
                 options:{sort:{createdAt:-1}},
             }
         });
-        if(!application){
+        if(!application.length){
             return res.status(404).json({message:"No jobs applied",
                 success:false
                 });
@@ -61,18 +61,19 @@ export const getAppliedJobs=async(req,res)=>{
             application
             });
     } catch (error) {
-        console.log(error);
+        return res.status(500).json({message:"Unable to load applications", success:false});
     }
 }
 //admin dekhega kitne log us job pe apply kiye hai
 export const getApplicants=async (req,res)=>{
     try {
         const jobId=req.params.id;
-        const job=await Job.findById(jobId).populate({
+        const job=await Job.findOne({ _id: jobId, created_by: req.id }).populate({
             path:'applications',
             options:{sort:{createdAt:-1}},
             populate:{
                 path:'applicant',
+                select:'-password',
                 options:{sort:{createdAt:-1}}
                 }
         });
@@ -86,7 +87,7 @@ export const getApplicants=async (req,res)=>{
             job
             });
     } catch (error) {
-        console.log(error);
+        return res.status(500).json({message:"Unable to load applicants", success:false});
     }
 }
 export const updateStatus=async (req,res)=>{
@@ -98,13 +99,21 @@ export const updateStatus=async (req,res)=>{
                 success:false
                 });
         }
-        const application=await Application.findOne({_id:applicationId});
+        const application=await Application.findById(applicationId).populate('job');
         if(!application){
             return res.status(404).json({message:"Application not found",
                 success:false
                 });
         }
-        application.status=status.toLowerCase();
+        const allowedStatuses = ['pending', 'accepted', 'rejected'];
+        const normalizedStatus = String(status).toLowerCase();
+        if (!allowedStatuses.includes(normalizedStatus)) {
+            return res.status(400).json({message:"Invalid application status", success:false});
+        }
+        if (String(application.job.created_by) !== String(req.id)) {
+            return res.status(403).json({message:"You do not own this job", success:false});
+        }
+        application.status=normalizedStatus;
         await application.save();
         return res.status(200).json({
             success:true,
@@ -112,6 +121,6 @@ export const updateStatus=async (req,res)=>{
             application
             });
     } catch (error) {
-        console.log(error);
+        return res.status(500).json({message:"Unable to update application status", success:false});
     }
 };

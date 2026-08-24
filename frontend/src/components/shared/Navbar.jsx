@@ -1,15 +1,13 @@
-import React from "react";
-import { LogOut, User2 } from "lucide-react";
-import { Button } from "../ui/button";
-import { Avatar, AvatarImage } from "../ui/avatar";
-import { Link, useNavigate } from "react-router-dom";
-import store from "@/redux/store";
-import { useDispatch, useSelector } from "react-redux";
-import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
-import { USER_API_END_POINT } from "@/utils/constant";
 import { setUser } from "@/redux/authSlice";
-import { toast } from "sonner";
+import { USER_API_END_POINT } from "@/utils/constant";
 import axios from "axios";
+import { LogOut, User2 } from "lucide-react";
+import { useDispatch, useSelector } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import { Avatar, AvatarImage } from "../ui/avatar";
+import { Button } from "../ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 
 const Navbar = () => {
   const { user } = useSelector((store) => store.auth);
@@ -32,15 +30,15 @@ const Navbar = () => {
   };
 
   return (
-    <div className="bg-white">
-      <div className="flex items-center justify-between mx-auto max-w-7xl h-16">
+    <div className="border-b border-slate-200/80 bg-white/95 backdrop-blur">
+      <div className="mx-auto flex min-h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
         <div>
           <h1 className="text-2xl font-bold">
             Job<span className="text-[#F83002]">Connect</span>
           </h1>
         </div>
-        <div className="flex items-center gap-12">
-          <ul className="flex font-medium items-center gap-5">
+        <div className="flex items-center gap-4 sm:gap-10">
+          <ul className="hidden items-center gap-5 font-medium text-slate-600 sm:flex">
             {user && user.role == "recruiter" ? (
               <>
                 <li>
@@ -70,7 +68,7 @@ const Navbar = () => {
                 <Button variant="outline">Login</Button>
               </Link>
               <Link to="/signup">
-                <Button className="bg-[#6A38C2] hover:bg-[#5b30a6]">
+                <Button className="bg-teal-700 hover:bg-teal-800">
                   Signup
                 </Button>
               </Link>

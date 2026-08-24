@@ -1,9 +1,23 @@
-import admin from 'firebase-admin';
-import serviceAccount from './jobconnect-e95b7-firebase-adminsdk-fbsvc-60e88ad184.json' assert { type: "json" };
+import dotenv from "dotenv";
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
-});
+dotenv.config();
+
+let admin = null;
+try {
+  ({ default: admin } = await import("firebase-admin"));
+} catch (error) {
+  admin = null;
+}
+
+if (admin && !admin.apps.length && process.env.FIREBASE_PROJECT_ID) {
+  admin.initializeApp({
+    credential: admin.credential.cert({
+      projectId: process.env.FIREBASE_PROJECT_ID,
+      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+      privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
+    }),
+  });
+}
 
 
 export default admin;

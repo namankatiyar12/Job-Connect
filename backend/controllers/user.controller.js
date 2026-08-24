@@ -6,15 +6,23 @@ import cloudinary from "../utils/cloudinary.js";
 import getDataUri from "../utils/datauri.js";
 export const register = async (req, res) => {
   try {
-    const { fullname, email, phoneNumber, password, role } = req.body;
+    const { fullname, email: rawEmail, phoneNumber, password, role } = req.body;
+    const email = rawEmail?.trim().toLowerCase();
     if (!fullname || !email || !phoneNumber || !password || !role) {
       return res
         .status(400)
         .json({ message: "Something is missing", success: false });
     }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return res.status(400).json({ message: "Enter a valid email address", success: false });
+    }
     const file = req.file;
-    const fileUri = getDataUri(file);
-    const cloudResponse = await cloudinary.uploader.upload(fileUri.content);
+    let profilePhoto = "";
+    if (file) {
+      const fileUri = getDataUri(file);
+      const cloudResponse = await cloudinary.uploader.upload(fileUri.content);
+      profilePhoto = cloudResponse.secure_url;
+    }
     let user = await User.findOne({ email });
     if (user) {
       return res
@@ -29,20 +37,21 @@ export const register = async (req, res) => {
       role,
       password: hashedPassword,
       profile: {
-        profilePhoto: cloudResponse.secure_url,
+        profilePhoto,
       },
     });
     return res
       .status(201)
       .json({ message: "User created successfully", success: true });
   } catch (error) {
-    console.log(error);
+    return res.status(500).json({ message: "Unable to register user", success: false });
   }
 };
 
 export const login = async (req, res) => {
   try {
-    const { email, password, role } = req.body;
+    const { email: rawEmail, password, role } = req.body;
+    const email = rawEmail?.trim().toLowerCase();
     if (!email || !password || !role) {
       return res
         .status(400)
@@ -85,9 +94,10 @@ export const login = async (req, res) => {
     return res
       .status(200)
       .cookie("token", token, {
-        maxage: 1 * 24 * 60 * 60 * 1000,
-        httpsOly: true,
-        sameSite: "strict",
+        maxAge: 1 * 24 * 60 * 60 * 1000,
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       })
       .json({
         message: `Welcome back${user.fullname}`,
@@ -95,7 +105,7 @@ export const login = async (req, res) => {
         success: true,
       });
   } catch (error) {
-    console.log(error);
+    return res.status(500).json({ message: "Unable to login", success: false });
   }
 };
 export const logout = async (req, res) => {
@@ -105,13 +115,18 @@ export const logout = async (req, res) => {
       success: true,
     });
   } catch (error) {
-    console.log(error);
+    return res.status(500).json({ message: "Unable to logout", success: false });
   }
 };
 export const updateProfile = async (req, res) => {
   try {
     const { fullname, email, phoneNumber, bio, skills } = req.body;
     const file = req.file;
+    const userId = req.id;
+    let user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User does not exist", success: false });
+    }
     if (file) {
       const fileUri = getDataUri(file);
       const cloudResponse = await cloudinary.uploader.upload(fileUri.content);
@@ -124,13 +139,6 @@ export const updateProfile = async (req, res) => {
     let skillsArray;
     if (skills) {
       skillsArray = skills.split(",");
-    }
-    const userId = req.id; //middleware authentication
-    let user = await User.findById(userId);
-    if (!user) {
-      return res
-        .status(400)
-        .json({ message: "User does not exist", success: false });
     }
     if (fullname) {
       user.fullname = fullname;
@@ -151,13 +159,15 @@ export const updateProfile = async (req, res) => {
     //resume section
 
     await user.save();
+    const safeUser = user.toObject();
+    delete safeUser.password;
     return res.status(200).json({
       message: "Profile updated successfully",
-      user,
+      user: safeUser,
       success: true,
     });
   } catch (error) {
-    console.log(error);
+    return res.status(500).json({ message: "Unable to update profile", success: false });
   }
 };
 export const verifytoken = async (req, res, next) => {
@@ -169,26 +179,30 @@ export const verifytoken = async (req, res, next) => {
       return res.status(401).send("Unauthorized");
     }
 
-    const decodedUser = await admin.auth().verifyIdToken(token);
+    if (!admin?.apps?.length) {
+      return res.status(503).json({ message: "Google authentication is not configured", success: false });
+    }
+    const decodedUser = await admin.auth().verifyIdToken(token.replace(/^Bearer\s+/i, ""));
 
     req.user = decodedUser;
     next(); 
   } catch (error) {
     console.error("Token verification failed:", error);
-    return res.status(500).json({ message: "Server error" });
+    return res.status(401).json({ message: "Invalid Google token", success: false });
   }
 };
 
 export const gogleauth = async (req, res) => {
   try {
     const { name, email, picture } = req.user;
-  
-    let user = User.findOne({ email });
+    let user = await User.findOne({ email });
     if (!user) {
-      user = new User({ name, email, role: 'student' });
+      user = new User({ fullname: name || email.split("@")[0], email, phoneNumber: 0, password: await bcrypt.hash(jwt.sign({ email }, process.env.SECRET_KEY), 10), role: 'student', profile: { profilePhoto: picture || "" } });
       await user.save();
     }
-    res.send(user);
+    const safeUser = user.toObject();
+    delete safeUser.password;
+    return res.status(201).json({ success: true, user: safeUser });
   } catch (error) {
     res.status(500).json({ message: "Internal server error in registering " });
   }
@@ -198,13 +212,15 @@ export const goglelogin = async (req, res) => {
   try {
     const { name, email, picture } = req.user;
   
-    let user = User.findOne({ email });
+    let user = await User.findOne({ email });
     if (!user) {
-      user = new User({ name, email, role: 'student' });
+      user = new User({ fullname: name || email.split("@")[0], email, phoneNumber: 0, password: await bcrypt.hash(jwt.sign({ email }, process.env.SECRET_KEY), 10), role: 'student', profile: { profilePhoto: picture || "" } });
       await user.save();
     }
-    
-    res.status(200).json({ success: true, message: "Login successful", user });
+    const token = jwt.sign({ userId: user._id }, process.env.SECRET_KEY, { expiresIn: "1d" });
+    const safeUser = user.toObject();
+    delete safeUser.password;
+    return res.status(200).cookie("token", token, { maxAge: 86400000, httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: process.env.NODE_ENV === "production" ? "none" : "lax" }).json({ success: true, message: "Login successful", user: safeUser });
   } catch (error) {
     res.status(500).json({ message: "Internal server error in registering " });
   }

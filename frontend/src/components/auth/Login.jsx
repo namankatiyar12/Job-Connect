@@ -1,4 +1,3 @@
-import { auth, googleProvider } from "@/firebasse";
 import { setLoading, setUser } from "@/redux/authSlice";
 import { USER_API_END_POINT } from "@/utils/constant";
 import axios from "axios";
@@ -8,6 +7,7 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { auth, googleProvider } from "../../../firebasse.js";
 import Navbar from "../shared/Navbar";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";

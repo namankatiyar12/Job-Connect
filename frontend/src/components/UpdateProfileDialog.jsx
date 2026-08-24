@@ -1,14 +1,14 @@
-import React, { useState } from "react";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "./ui/dialog";
-import { Label } from "./ui/label";
-import { Input } from "./ui/input";
-import { Button } from "./ui/button";
+import { setUser } from "@/redux/authSlice";
+import { USER_API_END_POINT } from "@/utils/constant";
+import axios from "axios";
 import { Loader2 } from "lucide-react";
+import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
-import axios from "axios";
-import { USER_API_END_POINT } from "@/utils/constant";
-import { setUser } from "@/redux/authSlice";
+import { Button } from "./ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "./ui/dialog";
+import { Input } from "./ui/input";
+import { Label } from "./ui/label";
 
 const UpdateProfileDialog = ({ open, setOpen }) => {
     const [loading,setLoading]=useState(false);
@@ -108,7 +108,7 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
                 type="number"
                 value={input.phoneNumber}
                 onChange={changeEventHandler}
-                name="number" className="col-span-3" />
+                name="phoneNumber" className="col-span-3" />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="bio" className="text-right">

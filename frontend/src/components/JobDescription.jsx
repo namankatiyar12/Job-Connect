@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from "react";
+import { setSingleJob } from "@/redux/jobSlice";
+import { APPLICATION_API_END_POINT, JOB_API_END_POINT } from "@/utils/constant";
+import axios from "axios";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
+import { toast } from "sonner";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
-import { useParams } from "react-router-dom";
-import { setSingleJob } from "@/redux/jobSlice";
-import axios from "axios";
-import { APPLICATION_API_END_POINT, JOB_API_END_POINT } from "@/utils/constant";
-import { useDispatch, useSelector } from "react-redux";
-import { toast } from "sonner";
 
 const JobDescription = () => {
   const { singleJob } = useSelector((store) => store.job);
@@ -31,7 +31,7 @@ const JobDescription = () => {
         setIsApplied(true); //update the local state
         const updatedSingleJob = {
           ...singleJob,
-          applications: [...singleJob.application, { applicant: user?._id }],
+          applications: [...(singleJob.applications || []), { applicant: user?._id }],
         }; //destructring mei kisi ek bhi change kr sakte hai
         dispatch(setSingleJob(updatedSingleJob)); //real time ui update
         toast.success(res.data.message);
@@ -119,7 +119,7 @@ const JobDescription = () => {
         <h1 className="font-bold my-1">
           Experience:
           <span className="pl-4 font-normal text-gray-800">
-            {singleJob?.experence}yrs
+            {singleJob?.experienceLevel}yrs
           </span>
         </h1>
         <h1 className="font-bold my-1">
@@ -131,13 +131,13 @@ const JobDescription = () => {
         <h1 className="font-bold my-1">
           Total Applicants:
           <span className="pl-4 font-normal text-gray-800">
-            {singleJob?.applications.length}
+            {singleJob?.applications?.length || 0}
           </span>
         </h1>
         <h1 className="font-bold my-1">
           Posted Date:
           <span className="pl-4 font-normal text-gray-800">
-            {singleJob?.createdAt.split("T")[0]}
+            {singleJob?.createdAt?.split("T")[0]}
           </span>
         </h1>
       </div>

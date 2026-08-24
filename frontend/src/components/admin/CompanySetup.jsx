@@ -1,16 +1,15 @@
-import React, { useEffect, useState } from "react";
+import useGetCompanyById from "@/hooks/useGetCompanyById";
+import { COMPANY_API_END_POINT } from "@/utils/constant";
+import axios from "axios";
+import { ArrowLeft, Loader2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { useNavigate, useParams } from "react-router-dom";
+import { toast } from "sonner";
 import Navbar from "../shared/Navbar";
 import { Button } from "../ui/button";
-import { ArrowLeft, Loader2 } from "lucide-react";
-import { Label } from "../ui/label";
 import { Input } from "../ui/input";
-import { COMPANY_API_END_POINT } from "@/utils/constant";
-import { useNavigate, useParams } from "react-router-dom";
-import axios from "axios";
-import store from "@/redux/store";
-import useGetCompanyById from "@/hooks/useGetCompanyById";
-import { useSelector } from "react-redux";
-import { toast } from "sonner";
+import { Label } from "../ui/label";
 
 const CompanySetup = () => {
   const params = useParams();
@@ -72,11 +71,11 @@ const CompanySetup = () => {
 
   useEffect(() => {
     setInput({
-      name: singleCompany.name || "",
-      description: singleCompany.description || "",
-      website: singleCompany.website || "",
-      location: singleCompany.location || "",
-      file: singleCompany.file || null,
+      name: singleCompany?.name || "",
+      description: singleCompany?.description || "",
+      website: singleCompany?.website || "",
+      location: singleCompany?.location || "",
+      file: null,
     });
   }, [singleCompany]);
 
