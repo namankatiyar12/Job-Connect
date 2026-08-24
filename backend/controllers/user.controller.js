@@ -200,9 +200,15 @@ export const gogleauth = async (req, res) => {
       user = new User({ fullname: name || email.split("@")[0], email, phoneNumber: 0, password: await bcrypt.hash(jwt.sign({ email }, process.env.SECRET_KEY), 10), role: 'student', profile: { profilePhoto: picture || "" } });
       await user.save();
     }
+    const token = jwt.sign({ userId: user._id }, process.env.SECRET_KEY, { expiresIn: "1d" });
     const safeUser = user.toObject();
     delete safeUser.password;
-    return res.status(201).json({ success: true, user: safeUser });
+    return res.status(201).cookie("token", token, {
+      maxAge: 86400000,
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    }).json({ success: true, user: safeUser });
   } catch (error) {
     res.status(500).json({ message: "Internal server error in registering " });
   }

@@ -1,4 +1,4 @@
-import { setLoading } from "@/redux/authSlice";
+import { setLoading, setUser } from "@/redux/authSlice";
 import { USER_API_END_POINT } from "@/utils/constant";
 import axios from "axios";
 import { signInWithPopup } from "firebase/auth";
@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { auth, googleProvider } from '../../../firebasse.js';
+import { auth, googleProvider } from '../../../firebase.js';
 import Navbar from "../shared/Navbar";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
@@ -77,21 +77,26 @@ const Signup = () => {
   
   const handleGoogleSignIn = async () => {
   try {
+      dispatch(setLoading(true));
     const result = await signInWithPopup(auth, googleProvider);
-    console.log(result);
-
     const token = await result.user.getIdToken();
     
     const response = await axios.post(`${USER_API_END_POINT}/goglesignup`, {}, {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: token, 
+        Authorization: `Bearer ${token}`,
       },
+      withCredentials: true,
     });
 
-    console.log("userData: ", response.data);
+    dispatch(setUser(response.data?.user));
+    navigate("/");
+    toast.success("Account created with Google");
   } catch (error) {
     console.error("Error in signing in:", error);
+    toast.error(error.response?.data?.message || error.message || "Google signup failed");
+  } finally {
+    dispatch(setLoading(false));
   }
 };
 
@@ -188,15 +193,17 @@ const Signup = () => {
         
       </div>
       <button
+  type="button"
+  disabled={loading}
   onClick={handleGoogleSignIn}
-  className="flex items-center justify-center gap-2 w-full bg-red-600 text-white p-3 rounded-md font-semibold hover:bg-red-700 transition-all duration-200 my-4"
+  className="mx-auto flex w-[calc(100%-2rem)] max-w-md items-center justify-center gap-2 rounded-md border border-slate-300 bg-white p-3 font-semibold text-slate-700 shadow-sm transition-all duration-200 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
 >
   <img
     src="/google-icon.svg"
     alt="Google Logo"
     className="h-5 w-5"
   />
-  Sign in with Google
+  {loading ? "Connecting..." : "Continue with Google"}
 </button>
     </div>
   );

@@ -1,42 +1,24 @@
-// import { initializeApp } from 'firebase/app';
-// import { getAuth, GoogleAuthProvider } from 'firebase/auth';
-
-// const firebaseConfig = {
-//   apiKey: "AIzaSyB_yFOzw9AJXXmvwkGbHRgPgZpL2YsnhxE",
-//   authDomain: "jobconnect-e95b7.firebaseapp.com",
-//   projectId: "jobconnect-e95b7",
-//   storageBucket: "jobconnect-e95b7.firebasestorage.app",
-//   messagingSenderId: "174513197440",
-//   appId: "1:174513197440:web:d76be50e728cc68b13b165",
-//   measurementId: "G-ZKDJK7RFV6"
-// };
-
-// const app =
-//     initializeApp(firebaseConfig);
-
-// export const auth = getAuth(app);
-
-// export const googleProvider = new GoogleAuthProvider();
-
 import { initializeApp } from "firebase/app";
+import { getApps } from "firebase/app";
 import { getAuth, GoogleAuthProvider } from "firebase/auth";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDhAgM0D6L119ZMm5k6S9Ny5GDEoXZwj64",
-  authDomain: "jobconnect-5b855.firebaseapp.com",
-  projectId: "jobconnect-5b855",
-  storageBucket: "jobconnect-5b855.firebasestorage.app",
-  messagingSenderId: "663807858748",
-  appId: "1:663807858748:web:5a17ce58d00ea346dd0b39",
-  measurementId: "G-X9QX9E6WL2"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
-const app = initializeApp(firebaseConfig);
+const requiredConfig = ["apiKey", "authDomain", "projectId", "appId"];
+const missingConfig = requiredConfig.filter((key) => !firebaseConfig[key]);
 
-// 🔐 Auth setup
+if (missingConfig.length) {
+  throw new Error(`Missing Firebase configuration: ${missingConfig.join(", ")}`);
+}
+
+const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
 export const auth = getAuth(app);
-
-// 🔵 Google login provider
 export const googleProvider = new GoogleAuthProvider();
-
-export default app;
