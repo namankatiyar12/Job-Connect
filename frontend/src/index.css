@@ -2,6 +2,26 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --background: 244 247 246;
+  --foreground: 15 23 42;
+  --input: 203 213 225;
+  --ring: 13 148 136;
+  --primary: 15 118 110;
+  --primary-foreground: 255 255 255;
+  --muted-foreground: 100 116 139;
+}
+
+.dark {
+  --background: 15 23 42;
+  --foreground: 226 232 240;
+  --input: 71 85 105;
+  --ring: 45 212 191;
+  --primary: 45 212 191;
+  --primary-foreground: 15 23 42;
+  --muted-foreground: 148 163 184;
+}
+
 body {
   margin: 0;
   font-family: Georgia, "Times New Roman", serif;
