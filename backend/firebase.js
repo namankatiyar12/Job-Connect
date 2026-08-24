@@ -9,7 +9,11 @@ try {
   admin = null;
 }
 
-if (admin && !admin.apps.length && process.env.FIREBASE_PROJECT_ID) {
+const hasFirebaseCredentials = process.env.FIREBASE_PROJECT_ID &&
+  process.env.FIREBASE_CLIENT_EMAIL &&
+  process.env.FIREBASE_PRIVATE_KEY;
+
+if (admin && !admin.apps.length && hasFirebaseCredentials) {
   admin.initializeApp({
     credential: admin.credential.cert({
       projectId: process.env.FIREBASE_PROJECT_ID,
