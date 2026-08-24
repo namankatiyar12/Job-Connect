@@ -1,13 +1,12 @@
 import { setLoading, setUser } from "@/redux/authSlice";
 import { USER_API_END_POINT } from "@/utils/constant";
+import { GoogleLogin } from "@react-oauth/google";
 import axios from "axios";
-import { signInWithPopup } from "firebase/auth";
 import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { auth, googleProvider } from "../../../firebase.js";
 import Navbar from "../shared/Navbar";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
@@ -56,14 +55,11 @@ const Login = () => {
   },[])
 
   
-const handleGoogleSignIn = async () => {
+const handleGoogleSignIn = async (credentialResponse) => {
   try {
     dispatch(setLoading(true));
-    const result = await signInWithPopup(auth, googleProvider);
-    const token = await result.user.getIdToken();
-
     const response = await axios.post(`${USER_API_END_POINT}/goglelogin`, {}, {
-      headers: { Authorization: `Bearer ${token}` },
+      headers: { Authorization: `Bearer ${credentialResponse.credential}` },
       withCredentials: true, 
     });
 
@@ -158,19 +154,9 @@ const handleGoogleSignIn = async () => {
         </form>
         
       </div>
-      <button
-          type="button"
-          disabled={loading}
-          onClick={handleGoogleSignIn}
-          className="mx-auto flex w-[calc(100%-2rem)] max-w-md items-center justify-center gap-2 rounded-md border border-slate-300 bg-white p-3 font-semibold text-slate-700 shadow-sm transition-all duration-200 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          <img
-            src="/google-icon.svg"
-            alt="Google Logo"
-            className="h-5 w-5"
-          />
-          {loading ? "Connecting..." : "Continue with Google"}
-        </button>
+      <div className="mx-auto my-4 flex min-h-10 w-[calc(100%-2rem)] max-w-md justify-center">
+        <GoogleLogin onSuccess={handleGoogleSignIn} onError={() => toast.error("Google login failed")} useOneTap={false} />
+      </div>
     </div>
   );
 };

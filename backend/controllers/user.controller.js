@@ -1,6 +1,6 @@
 import bcrypt from "bcryptjs";
+import { OAuth2Client } from "google-auth-library";
 import jwt from "jsonwebtoken";
-import admin from '../firebase.js';
 import { User } from "../models/user.model.js";
 import cloudinary from "../utils/cloudinary.js";
 import getDataUri from "../utils/datauri.js";
@@ -172,22 +172,19 @@ export const updateProfile = async (req, res) => {
 };
 export const verifytoken = async (req, res, next) => {
   try {
-    const token = req.headers.authorization; 
-    console.log('Verifying token...');
-
-    if (!token) {
-      return res.status(401).send("Unauthorized");
+    const authorization = req.headers.authorization;
+    const token = authorization?.replace(/^Bearer\s+/i, "");
+    if (!token || !process.env.GOOGLE_CLIENT_ID) {
+      return res.status(401).json({ message: "Google authentication is not configured", success: false });
     }
-
-    if (!admin?.apps?.length) {
-      return res.status(503).json({ message: "Google authentication is not configured", success: false });
-    }
-    const decodedUser = await admin.auth().verifyIdToken(token.replace(/^Bearer\s+/i, ""));
-
-    req.user = decodedUser;
+    const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+    const ticket = await googleClient.verifyIdToken({
+      idToken: token,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+    req.user = ticket.getPayload();
     next(); 
   } catch (error) {
-    console.error("Token verification failed:", error);
     return res.status(401).json({ message: "Invalid Google token", success: false });
   }
 };
