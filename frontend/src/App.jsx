@@ -1,19 +1,20 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import Home from "./components/Home";
-import Login from "./components/auth/Login";
-import Signup from "./components/auth/Signup";
-import Jobs from "./components/Jobs";
 import Browse from "./components/Browse";
-import Profile from "./components/Profile";
+import Home from "./components/Home";
 import JobDescription from "./components/JobDescription";
+import Jobs from "./components/Jobs";
+import Profile from "./components/Profile";
 import Companies from "./components/admin/Companies";
 import CompanyCreate from "./components/admin/CompanyCreate";
 import CompanySetup from "./components/admin/CompanySetup";
+import Login from "./components/auth/Login";
+import Signup from "./components/auth/Signup";
 
 import AdminJobs from "./components/admin/AdminJobs";
+import Applicants from "./components/admin/Applicants";
 import PostJob from "./components/admin/PostJob";
 import ProtectedRoute from "./components/admin/ProtectedRoute";
-import Applicants from "./components/admin/Applicants";
+import VerifyEmail from "./components/auth/VerifyEmail";
 
 const appRouter = createBrowserRouter([
   {
@@ -27,6 +28,10 @@ const appRouter = createBrowserRouter([
   {
     path: "/signup",
     element: <Signup/>,
+  },
+  {
+    path: "/verify-email",
+    element: <VerifyEmail/>,
   },
   {
     path: "/jobs",

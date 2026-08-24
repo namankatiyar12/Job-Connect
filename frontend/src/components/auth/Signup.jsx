@@ -52,8 +52,8 @@ const Signup = () => {
       withCredentials:true,
     });
     if(res.data.success){
-      navigate("/login");
-      toast.success(res.data.message);
+      navigate(`/verify-email?email=${encodeURIComponent(input.email)}`);
+      toast.success("Check your inbox to verify your email");
     }
   } catch (error) {
       console.log(error);

@@ -9,6 +9,18 @@ const userSchema=new mongoose.Schema({
         required:true,
         unique:true
     },
+    isEmailVerified:{
+        type:Boolean,
+        default:false
+    },
+    emailVerificationToken:{
+        type:String,
+        select:false
+    },
+    emailVerificationExpires:{
+        type:Date,
+        select:false
+    },
     phoneNumber:{
         type:Number,
         required:true

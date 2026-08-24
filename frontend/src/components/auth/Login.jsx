@@ -42,7 +42,12 @@ const Login = () => {
       }
     } catch (error) {
       console.log(error);
-      toast.error(error.response?.data.message);
+      if (error.response?.status === 403) {
+        navigate(`/verify-email?email=${encodeURIComponent(input.email)}`);
+        toast.error("Please verify your email before signing in");
+      } else {
+        toast.error(error.response?.data?.message || "Unable to sign in");
+      }
     } finally {
       dispatch(setLoading(false));
     }
