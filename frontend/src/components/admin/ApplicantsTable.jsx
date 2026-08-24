@@ -1,7 +1,8 @@
 import { APPLICATION_API_END_POINT } from "@/utils/constant";
 import { Popover, PopoverTrigger } from "@radix-ui/react-popover";
 import axios from "axios";
-import { MoreHorizontal } from "lucide-react";
+import { MoreHorizontal, Search, SlidersHorizontal } from "lucide-react";
+import { useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { toast } from "sonner";
 import { PopoverContent } from "../ui/popover";
@@ -23,6 +24,22 @@ const getScoreStyle = (score) => {
 };
 const ApplicantsTable = () => {
   const { applicants } = useSelector((store) => store.application);
+  const [search, setSearch] = useState("");
+  const [resumeFilter, setResumeFilter] = useState("all");
+  const [minimumScore, setMinimumScore] = useState("0");
+
+  const filteredApplications = useMemo(() => {
+    const applications = applicants?.applications || [];
+    return applications.filter((item) => {
+      const applicant = item.applicant;
+      const searchText = `${applicant?.fullname || ""} ${applicant?.email || ""}`.toLowerCase();
+      const hasResume = Boolean(applicant?.profile?.resume);
+      const score = item?.atsScore?.score || 0;
+      return searchText.includes(search.toLowerCase()) &&
+        (resumeFilter === "all" || (resumeFilter === "resume" && hasResume) || (resumeFilter === "missing" && !hasResume)) &&
+        score >= Number(minimumScore);
+    });
+  }, [applicants, minimumScore, resumeFilter, search]);
 
   const statusHandler = async (status, id) => {
     console.log("called");
@@ -44,8 +61,25 @@ const ApplicantsTable = () => {
 
   return (
     <div>
+      <div className="mb-4 flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-slate-900 sm:flex-row sm:items-center">
+        <div className="flex flex-1 items-center gap-2 rounded-lg border border-slate-200 px-3 dark:border-slate-700">
+          <Search className="h-4 w-4 text-slate-400" />
+          <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search applicants" className="h-10 w-full bg-transparent text-sm outline-none dark:text-white" />
+        </div>
+        <div className="flex items-center gap-2 text-sm text-slate-500"><SlidersHorizontal className="h-4 w-4" /><span className="hidden sm:inline">Filter</span></div>
+        <select value={resumeFilter} onChange={(event) => setResumeFilter(event.target.value)} className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200">
+          <option value="all">All applicants</option>
+          <option value="resume">Has resume</option>
+          <option value="missing">No resume</option>
+        </select>
+        <select value={minimumScore} onChange={(event) => setMinimumScore(event.target.value)} className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200">
+          <option value="0">Any ATS score</option>
+          <option value="40">40%+ match</option>
+          <option value="70">70%+ match</option>
+        </select>
+      </div>
       <Table>
-        <TableCaption>A list of your recent applied user</TableCaption>
+        <TableCaption>Showing {filteredApplications.length} of {applicants?.applications?.length || 0} applicants</TableCaption>
         <TableHeader>
           <TableRow>
             <TableHead>FullName</TableHead>
@@ -61,7 +95,7 @@ const ApplicantsTable = () => {
 
         <TableBody>
           {applicants &&
-            applicants?.applications?.map((item) => (
+            filteredApplications.map((item) => (
               <tr key={item._id}>
                 <TableCell>{item?.applicant?.fullname}</TableCell>
                 <TableCell>{item?.applicant?.email}</TableCell>

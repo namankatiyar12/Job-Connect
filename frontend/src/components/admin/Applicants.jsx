@@ -1,11 +1,11 @@
-import React, { useEffect } from 'react'
-import Navbar from '../shared/Navbar'
-import ApplicantsTable from './ApplicantsTable'
-import axios from 'axios';
-import { APPLICATION_API_END_POINT } from '@/utils/constant';
-import { useParams } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
 import { setAllApplicants } from '@/redux/applicationSlice';
+import { APPLICATION_API_END_POINT } from '@/utils/constant';
+import axios from 'axios';
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useParams } from 'react-router-dom';
+import Navbar from '../shared/Navbar';
+import ApplicantsTable from './ApplicantsTable';
 
 const Applicants = () => {
     const params=useParams();
@@ -28,9 +28,10 @@ const Applicants = () => {
   return (
     <div>
         <Navbar />
-        <div className='max-w-7xl mx-auto'>
-            <h1 className='font-bold text-xl my-5'>
-                Applicants {applicants?.applications?.length}
+        <div className='mx-auto max-w-7xl px-4 py-8 sm:px-6'>
+            <p className="mb-2 text-xs font-bold uppercase tracking-[0.2em] text-teal-700">Hiring workspace</p>
+            <h1 className='mb-6 text-3xl font-bold tracking-tight text-slate-950 dark:text-white sm:text-4xl'>
+                Review applicants <span className="text-slate-400">({applicants?.applications?.length || 0})</span>
 
             </h1>
             <ApplicantsTable/>
