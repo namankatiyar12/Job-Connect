@@ -8,23 +8,35 @@ const getKeywords = (value = "") => value
   .split(/\s+/)
   .filter((word) => word.length > 2 && !stopWords.has(word));
 
+const uniqueKeywords = (value) => [...new Set(getKeywords(value))];
+const getMatches = (required, available) => required.filter((keyword) => available.has(keyword));
+
 export const calculateAtsScore = (job, applicant) => {
-  const requiredText = [job.title, job.description, ...(job.requirements || [])].join(" ");
-  const requiredKeywords = [...new Set(getKeywords(requiredText))];
-  const applicantText = [
+  const titleKeywords = uniqueKeywords(job.title);
+  const requirementKeywords = uniqueKeywords((job.requirements || []).join(" "));
+  const profileKeywords = new Set(uniqueKeywords([
     ...(applicant.profile?.skills || []),
     applicant.profile?.bio,
     applicant.profile?.resumeOriginalName,
-  ].join(" ");
-  const applicantKeywords = new Set(getKeywords(applicantText));
-  const matchedKeywords = requiredKeywords.filter((keyword) => applicantKeywords.has(keyword));
-  const missingKeywords = requiredKeywords.filter((keyword) => !applicantKeywords.has(keyword));
-  const score = requiredKeywords.length
-    ? Math.round((matchedKeywords.length / requiredKeywords.length) * 100)
-    : 0;
+  ].join(" ")));
+  const titleMatches = getMatches(titleKeywords, profileKeywords);
+  const requirementMatches = getMatches(requirementKeywords, profileKeywords);
+  const matchedKeywords = [...new Set([...titleMatches, ...requirementMatches])];
+  const missingKeywords = [...new Set([
+    ...titleKeywords.filter((keyword) => !profileKeywords.has(keyword)),
+    ...requirementKeywords.filter((keyword) => !profileKeywords.has(keyword)),
+  ])];
+  const titleScore = titleKeywords.length ? Math.round((titleMatches.length / titleKeywords.length) * 100) : 0;
+  const requirementScore = requirementKeywords.length ? Math.round((requirementMatches.length / requirementKeywords.length) * 100) : 0;
+  const resumeScore = applicant.profile?.resume ? 100 : 0;
+  const score = Math.round(titleScore * 0.3 + requirementScore * 0.55 + resumeScore * 0.15);
 
   return {
     score,
+    titleScore,
+    requirementScore,
+    resumeScore,
+    hasResume: Boolean(applicant.profile?.resume),
     matchedKeywords: matchedKeywords.slice(0, 12),
     missingKeywords: missingKeywords.slice(0, 12),
   };

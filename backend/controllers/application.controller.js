@@ -84,8 +84,9 @@ export const getApplicants=async (req,res)=>{
                 });
         }
             job.applications = job.applications.map((application) => {
-                application.atsScore = calculateAtsScore(job, application.applicant);
-                return application;
+                const applicationData = application.toObject();
+                applicationData.atsScore = calculateAtsScore(job, application.applicant);
+                return applicationData;
             });
         return res.status(200).json({
             success:true,

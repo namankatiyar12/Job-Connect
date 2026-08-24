@@ -27,10 +27,11 @@ const ApplicantsTable = () => {
   const [search, setSearch] = useState("");
   const [resumeFilter, setResumeFilter] = useState("all");
   const [minimumScore, setMinimumScore] = useState("0");
+  const [sortBy, setSortBy] = useState("score");
 
   const filteredApplications = useMemo(() => {
     const applications = applicants?.applications || [];
-    return applications.filter((item) => {
+    const results = applications.filter((item) => {
       const applicant = item.applicant;
       const searchText = `${applicant?.fullname || ""} ${applicant?.email || ""}`.toLowerCase();
       const hasResume = Boolean(applicant?.profile?.resume);
@@ -39,7 +40,11 @@ const ApplicantsTable = () => {
         (resumeFilter === "all" || (resumeFilter === "resume" && hasResume) || (resumeFilter === "missing" && !hasResume)) &&
         score >= Number(minimumScore);
     });
-  }, [applicants, minimumScore, resumeFilter, search]);
+    return results.sort((first, second) => {
+      if (sortBy === "recent") return new Date(second.createdAt) - new Date(first.createdAt);
+      return (second?.atsScore?.score || 0) - (first?.atsScore?.score || 0);
+    });
+  }, [applicants, minimumScore, resumeFilter, search, sortBy]);
 
   const statusHandler = async (status, id) => {
     console.log("called");
@@ -77,6 +82,10 @@ const ApplicantsTable = () => {
           <option value="40">40%+ match</option>
           <option value="70">70%+ match</option>
         </select>
+        <select value={sortBy} onChange={(event) => setSortBy(event.target.value)} className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200">
+          <option value="score">Best ATS match</option>
+          <option value="recent">Most recent</option>
+        </select>
       </div>
       <Table>
         <TableCaption>Showing {filteredApplications.length} of {applicants?.applications?.length || 0} applicants</TableCaption>
@@ -106,7 +115,7 @@ const ApplicantsTable = () => {
                       {item?.atsScore?.score || 0}%
                     </span>
                     <div className="pointer-events-none absolute bottom-full left-0 z-10 mb-2 hidden w-64 rounded-lg border bg-white p-3 text-xs text-slate-600 shadow-xl group-hover:block dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300">
-                      <strong className="text-slate-900 dark:text-white">Matched skills:</strong> {item?.atsScore?.matchedKeywords?.join(", ") || "No matches yet"}
+                      <strong className="text-slate-900 dark:text-white">Breakdown:</strong> title {item?.atsScore?.titleScore || 0}% / requirements {item?.atsScore?.requirementScore || 0}% / resume {item?.atsScore?.resumeScore || 0}%<br /><strong className="text-slate-900 dark:text-white">Matched skills:</strong> {item?.atsScore?.matchedKeywords?.join(", ") || "No matches yet"}
                       {item?.atsScore?.missingKeywords?.length > 0 && <><br /><strong className="text-slate-900 dark:text-white">Missing keywords:</strong> {item.atsScore.missingKeywords.join(", ")}</>}
                     </div>
                   </div>
