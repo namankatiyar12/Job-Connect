@@ -78,15 +78,16 @@ const handleGoogleSignIn = async (credentialResponse) => {
 
 
   return (
-    <div className="bg-white min-h-screen">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
       <Navbar />
-      <div className="flex items-center justify-center max-w-7xl mx-auto">
+      <div className="mx-auto flex max-w-7xl items-center justify-center px-4 py-10 sm:px-6 sm:py-16">
         <form
           onSubmit={submitHandler}
-          className="w-1/2 border border-gray-200 rounded md p-4 my-10"
+          className="animate-rise-in w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-xl shadow-slate-200/60 dark:border-slate-800 dark:bg-slate-900 dark:shadow-none sm:p-8"
         >
-          <h1 className="font-bold text-xl mb-5">Login</h1>
-
+          <p className="mb-2 text-xs font-bold uppercase tracking-[0.2em] text-teal-700">Welcome back</p>
+          <h1 className="mb-2 text-3xl font-bold tracking-tight text-slate-950 dark:text-white">Sign in to JobConnect</h1>
+          <p className="mb-6 text-sm text-slate-500">Pick up where your next opportunity begins.</p>
           <div className="my-2">
             <Label>Email</Label>
             <Input
@@ -147,14 +148,13 @@ const handleGoogleSignIn = async (credentialResponse) => {
 
           <span className="text-small">
             Don't have an account?{" "}
-            <Link to="/signup" className="text-blue-600">
+            <Link to="/signup" className="font-semibold text-teal-700 hover:underline">
               Sign up
             </Link>
           </span>
         </form>
-        
       </div>
-      <div className="mx-auto my-4 flex min-h-10 w-[calc(100%-2rem)] max-w-md justify-center">
+      <div className="mx-auto -mt-6 flex min-h-10 w-[calc(100%-2rem)] max-w-md justify-center pb-10">
         <GoogleLogin onSuccess={handleGoogleSignIn} onError={() => toast.error("Google login failed")} useOneTap={false} />
       </div>
     </div>

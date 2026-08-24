@@ -1,7 +1,8 @@
 import { setUser } from "@/redux/authSlice";
 import { USER_API_END_POINT } from "@/utils/constant";
 import axios from "axios";
-import { LogOut, User2 } from "lucide-react";
+import { BriefcaseBusiness, LogOut, Moon, Sun, User2 } from "lucide-react";
+import { useTheme } from "next-themes";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -13,6 +14,7 @@ const Navbar = () => {
   const { user } = useSelector((store) => store.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { resolvedTheme, setTheme } = useTheme();
   const logoutHandler = async () => {
     try {
       const res = await axios.get(`${USER_API_END_POINT}/logout`, {
@@ -30,40 +32,53 @@ const Navbar = () => {
   };
 
   return (
-    <div className="border-b border-slate-200/80 bg-white/95 backdrop-blur">
+    <div className="border-b border-slate-200/80 bg-white/95 backdrop-blur dark:border-slate-800 dark:bg-slate-950/95">
       <div className="mx-auto flex min-h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
-        <div>
-          <h1 className="text-2xl font-bold">
-            Job<span className="text-[#F83002]">Connect</span>
+        <Link to="/" className="flex items-center gap-2 text-slate-950 dark:text-white">
+          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-teal-700 text-white shadow-sm">
+            <BriefcaseBusiness className="h-5 w-5" />
+          </span>
+          <h1 className="text-2xl font-bold tracking-tight">
+            Job<span className="text-teal-700">Connect</span>
           </h1>
-        </div>
+        </Link>
         <div className="flex items-center gap-4 sm:gap-10">
-          <ul className="hidden items-center gap-5 font-medium text-slate-600 sm:flex">
+          <ul className="hidden items-center gap-5 font-medium text-slate-600 dark:text-slate-300 sm:flex">
             {user && user.role == "recruiter" ? (
               <>
                 <li>
-                  <Link to="/admin/companies">Companies</Link>
+                  <Link className="transition-colors hover:text-teal-700" to="/admin/companies">Companies</Link>
                 </li>
                 <li>
-                  <Link to="/admin/jobs">Jobs</Link>
+                  <Link className="transition-colors hover:text-teal-700" to="/admin/jobs">Jobs</Link>
                 </li>
               </>
             ) : (
               <>
                 <li>
-                  <Link to="/">Home</Link>
+                  <Link className="transition-colors hover:text-teal-700" to="/">Home</Link>
                 </li>
                 <li>
-                  <Link to="/jobs">Jobs</Link>
+                  <Link className="transition-colors hover:text-teal-700" to="/jobs">Jobs</Link>
                 </li>
                 <li>
-                  <Link to="/browse">Browse</Link>
+                  <Link className="transition-colors hover:text-teal-700" to="/browse">Browse</Link>
                 </li>
               </>
             )}
           </ul>
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label="Toggle color theme"
+            title="Toggle color theme"
+            onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
+            className="text-slate-600 dark:text-slate-300"
+          >
+            {resolvedTheme === "dark" ? <Sun /> : <Moon />}
+          </Button>
           {!user ? (
-            <div className="flex gap-2 items-center">
+            <div className="flex items-center gap-2">
               <Link to="/login">
                 <Button variant="outline">Login</Button>
               </Link>
@@ -85,7 +100,7 @@ const Navbar = () => {
                 </Avatar>
               </PopoverTrigger>
 
-              <PopoverContent className="w-80 bg-white">
+              <PopoverContent className="w-80 border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900">
                 <div className="flex gap-2 space-y-2">
                   <Avatar className="cursor-pointer">
                     <AvatarImage

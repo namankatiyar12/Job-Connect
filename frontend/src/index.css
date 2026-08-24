@@ -13,6 +13,48 @@ body {
   box-sizing: border-box;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
+::selection {
+  background: #99f6e4;
+  color: #134e4a;
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-rise-in {
+  animation: rise-in 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.animate-rise-in-delay {
+  animation: rise-in 700ms 120ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
 button,
 input,
 textarea,
@@ -25,4 +67,9 @@ textarea:focus-visible,
 button:focus-visible {
   outline: 3px solid rgba(13, 148, 136, 0.3);
   outline-offset: 2px;
+}
+
+body.dark {
+  background: #0f172a;
+  color: #e2e8f0;
 }

@@ -34,7 +34,6 @@ const Signup = () => {
   };
 
   const submitHandler = async(e) => {
-    e.preventDefault();
     const formData=new FormData();
     formData.append('fullname',input.fullname);
     formData.append('email',input.email);
@@ -98,21 +97,23 @@ const Signup = () => {
 
 
   return (
-    <div className="bg-white min-h-screen">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
       <Navbar />
-      <div className="flex items-center justify-center max-w-7xl mx-auto">
+      <div className="mx-auto flex max-w-7xl items-center justify-center px-4 py-10 sm:px-6 sm:py-16">
         <form
           onSubmit={submitHandler}
-          className="w-1/2 border border-gray-200 rounded md p-4 my-10"
+          className="animate-rise-in w-full max-w-2xl rounded-2xl border border-slate-200 bg-white p-6 shadow-xl shadow-slate-200/60 dark:border-slate-800 dark:bg-slate-900 dark:shadow-none sm:p-8"
         >
-          <h1 className="font-bold text-xl mb-5">Sign Up</h1>
+          <p className="mb-2 text-xs font-bold uppercase tracking-[0.2em] text-teal-700">Start your journey</p>
+          <h1 className="mb-2 text-3xl font-bold tracking-tight text-slate-950 dark:text-white">Create your JobConnect profile</h1>
+          <p className="mb-6 text-sm text-slate-500">A stronger profile gets you closer to the right team.</p>
           <div className="my-2">
             <Label>Full Name</Label>
             <Input type="text"
             value={input.fullname}
             name="fullname"
             onChange={changeEventHandler}
-            placeholder="Naman katiyar" />
+            placeholder="Naman Katiyar" />
           </div>
           <div className="my-2">
             <Label>Email</Label>
@@ -181,7 +182,7 @@ const Signup = () => {
           )}
           <span className="text-small">
             Already have an account?{" "}
-            <Link to="/login" className="text-blue-600">
+            <Link to="/login" className="font-semibold text-teal-700 hover:underline">
               Login
             </Link>
           </span>

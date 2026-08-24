@@ -1,4 +1,5 @@
 import { GoogleOAuthProvider } from "@react-oauth/google";
+import { ThemeProvider } from "next-themes";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { Provider } from "react-redux";
@@ -15,7 +16,9 @@ createRoot(document.getElementById("root")).render(
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
         <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
-          <App />
+          <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+            <App />
+          </ThemeProvider>
         </GoogleOAuthProvider>
       </PersistGate>
       
