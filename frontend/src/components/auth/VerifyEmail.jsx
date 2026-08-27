@@ -50,28 +50,48 @@ const VerifyEmail = () => {
   };
 
   const content = {
-    loading: { icon: <Loader2 className="h-10 w-10 animate-spin text-teal-700" />, title: "Verifying your email", text: "Just a moment while we confirm your account." },
-    waiting: { icon: <Mail className="h-10 w-10 text-teal-700" />, title: "Check your inbox", text: "Open the verification link sent to your email to activate your account." },
-    success: { icon: <CheckCircle2 className="h-10 w-10 text-emerald-600" />, title: "Email verified", text: message || "Your account is ready." },
-    error: { icon: <XCircle className="h-10 w-10 text-rose-600" />, title: "Verification failed", text: message },
+    loading: { icon: <Loader2 className="h-12 w-12 animate-spin text-teal-600 dark:text-teal-400" />, title: "Verifying Email", text: "Just a moment while we confirm your account token." },
+    waiting: { icon: <Mail className="h-12 w-12 text-teal-600 dark:text-teal-400" />, title: "Check Your Inbox", text: "We sent a verification link to your email. Click the link to activate your account." },
+    success: { icon: <CheckCircle2 className="h-12 w-12 text-emerald-500" />, title: "Email Verified!", text: message || "Your account is activated and ready for use." },
+    error: { icon: <XCircle className="h-12 w-12 text-rose-500" />, title: "Verification Failed", text: message },
   }[status];
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors">
       <Navbar />
       <main className="flex min-h-[calc(100vh-4rem)] items-center justify-center px-4 py-12">
-        <section className="animate-rise-in w-full max-w-md rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-xl shadow-slate-200/60 dark:border-slate-800 dark:bg-slate-900 dark:shadow-none">
-          <div className="mb-5 flex justify-center">{content.icon}</div>
-          <h1 className="text-2xl font-bold text-slate-950 dark:text-white">{content.title}</h1>
-          <p className="mt-3 text-sm leading-6 text-slate-500">{content.text}</p>
+        <section className="animate-rise-in w-full max-w-md rounded-3xl border border-slate-200/80 bg-white/90 p-8 text-center shadow-2xl shadow-slate-200/50 backdrop-blur-xl dark:border-slate-800 dark:bg-slate-900/90 dark:shadow-none sm:p-10">
+          <div className="mb-6 flex justify-center">{content.icon}</div>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">{content.title}</h1>
+          <p className="mt-3 text-sm leading-relaxed text-slate-500 dark:text-slate-400">{content.text}</p>
           {(status === "waiting" || status === "error") && (
-            <form onSubmit={handleResend} className="mt-6 text-left">
-              <Label htmlFor="verification-email">Email address</Label>
-              <Input id="verification-email" type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="you@example.com" className="mt-2" required />
-              <Button type="submit" disabled={resending} className="mt-4 w-full bg-teal-700 hover:bg-teal-800">{resending ? "Sending..." : "Resend verification email"}</Button>
+            <form onSubmit={handleResend} className="mt-6 text-left space-y-4">
+              <div>
+                <Label htmlFor="verification-email" className="text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-300">
+                  Email address
+                </Label>
+                <Input
+                  id="verification-email"
+                  type="email"
+                  value={email}
+                  onChange={(event) => setEmail(event.target.value)}
+                  placeholder="you@example.com"
+                  className="mt-1 rounded-xl border-slate-200 dark:border-slate-700 dark:bg-slate-800/50"
+                  required
+                />
+              </div>
+              <Button type="submit" disabled={resending} className="w-full rounded-xl bg-teal-700 font-semibold text-white hover:bg-teal-800">
+                {resending ? "Sending Email..." : "Resend Verification Link"}
+              </Button>
             </form>
           )}
-          {(status === "success" || status === "error") && <Link to="/login"><Button className="mt-7 bg-teal-700 hover:bg-teal-800">Continue to login</Button></Link>}
+          {(status === "success" || status === "error") && (
+            <Link to="/login" className="mt-8 block">
+              <Button className="w-full rounded-xl bg-gradient-to-r from-teal-600 to-emerald-600 font-semibold text-white shadow-md">
+                Continue to Sign In
+              </Button>
+            </Link>
+          )}
         </section>
       </main>
     </div>

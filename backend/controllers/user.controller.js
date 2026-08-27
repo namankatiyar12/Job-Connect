@@ -226,7 +226,7 @@ export const verifytoken = async (req, res, next) => {
     const authorization = req.headers.authorization;
     const token = authorization?.replace(/^Bearer\s+/i, "");
     if (!token || !process.env.GOOGLE_CLIENT_ID) {
-      return res.status(401).json({ message: "Google authentication is not configured", success: false });
+      return res.status(401).json({ message: "Google authentication is not configured on server", success: false });
     }
     const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
     const ticket = await googleClient.verifyIdToken({
@@ -243,16 +243,24 @@ export const verifytoken = async (req, res, next) => {
 export const gogleauth = async (req, res) => {
   try {
     const { name, email, picture } = req.user;
+    const { role } = req.body || {};
     let user = await User.findOne({ email });
     if (!user) {
-      user = new User({ fullname: name || email.split("@")[0], email, phoneNumber: 0, password: await bcrypt.hash(jwt.sign({ email }, process.env.SECRET_KEY), 10), role: 'student', profile: { profilePhoto: picture || "" } });
+      user = new User({
+        fullname: name || email.split("@")[0],
+        email,
+        phoneNumber: 9999999999,
+        password: await bcrypt.hash(jwt.sign({ email }, process.env.SECRET_KEY || "defaultsecret"), 10),
+        role: role === 'recruiter' ? 'recruiter' : 'student',
+        profile: { profilePhoto: picture || "" }
+      });
       await user.save();
     }
     if (!user.isEmailVerified) {
       user.isEmailVerified = true;
       await user.save();
     }
-    const token = jwt.sign({ userId: user._id }, process.env.SECRET_KEY, { expiresIn: "1d" });
+    const token = jwt.sign({ userId: user._id }, process.env.SECRET_KEY || "defaultsecret", { expiresIn: "1d" });
     const safeUser = user.toObject();
     delete safeUser.password;
     return res.status(201).cookie("token", token, {
@@ -260,30 +268,42 @@ export const gogleauth = async (req, res) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-    }).json({ success: true, user: safeUser });
+    }).json({ success: true, message: "Account created with Google", user: safeUser });
   } catch (error) {
-    res.status(500).json({ message: "Internal server error in registering " });
+    return res.status(500).json({ message: "Internal server error during Google signup", success: false });
   }
-}
+};
 
 export const goglelogin = async (req, res) => {
   try {
     const { name, email, picture } = req.user;
-  
+    const { role } = req.body || {};
     let user = await User.findOne({ email });
     if (!user) {
-      user = new User({ fullname: name || email.split("@")[0], email, phoneNumber: 0, password: await bcrypt.hash(jwt.sign({ email }, process.env.SECRET_KEY), 10), role: 'student', profile: { profilePhoto: picture || "" } });
+      user = new User({
+        fullname: name || email.split("@")[0],
+        email,
+        phoneNumber: 9999999999,
+        password: await bcrypt.hash(jwt.sign({ email }, process.env.SECRET_KEY || "defaultsecret"), 10),
+        role: role === 'recruiter' ? 'recruiter' : 'student',
+        profile: { profilePhoto: picture || "" }
+      });
       await user.save();
     }
     if (!user.isEmailVerified) {
       user.isEmailVerified = true;
       await user.save();
     }
-    const token = jwt.sign({ userId: user._id }, process.env.SECRET_KEY, { expiresIn: "1d" });
+    const token = jwt.sign({ userId: user._id }, process.env.SECRET_KEY || "defaultsecret", { expiresIn: "1d" });
     const safeUser = user.toObject();
     delete safeUser.password;
-    return res.status(200).cookie("token", token, { maxAge: 86400000, httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: process.env.NODE_ENV === "production" ? "none" : "lax" }).json({ success: true, message: "Login successful", user: safeUser });
+    return res.status(200).cookie("token", token, {
+      maxAge: 86400000,
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax"
+    }).json({ success: true, message: "Login successful", user: safeUser });
   } catch (error) {
-    res.status(500).json({ message: "Internal server error in registering " });
+    return res.status(500).json({ message: "Internal server error during Google login", success: false });
   }
-}
+};

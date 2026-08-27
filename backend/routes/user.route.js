@@ -13,5 +13,7 @@ router.route("/resend-verification").post(resendVerificationEmail);
 router.route("/profile/update").post(isAuthenticated, singleUpload, updateProfile);
 router.route("/goglesignup").post(verifytoken, gogleauth);
 router.route("/goglelogin").post(verifytoken, goglelogin);
-// goglelogin
+router.route("/google-signup").post(verifytoken, gogleauth);
+router.route("/google-login").post(verifytoken, goglelogin);
+
 export default router;

@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { Application } from "../models/application.model.js";
 import { Job } from "../models/job.model.js";
 import { calculateAtsScore } from "../utils/atsScore.js";
@@ -83,14 +84,16 @@ export const getApplicants=async (req,res)=>{
                 success:false
                 });
         }
-            job.applications = job.applications.map((application) => {
+        const jobData = job.toObject();
+        jobData.applications = job.applications.map((application) => {
                 const applicationData = application.toObject();
+                applicationData.applicationId = application._id.toString();
                 applicationData.atsScore = calculateAtsScore(job, application.applicant);
                 return applicationData;
             });
         return res.status(200).json({
             success:true,
-            job
+            job: jobData
             });
     } catch (error) {
         return res.status(500).json({message:"Unable to load applicants", success:false});
@@ -100,6 +103,9 @@ export const updateStatus=async (req,res)=>{
     try {
         const {status}=req.body;
         const applicationId=req.params.id;
+        if (!applicationId || applicationId === "undefined" || !mongoose.Types.ObjectId.isValid(applicationId)) {
+            return res.status(400).json({message:"Invalid application ID", success:false});
+        }
         if(!status){
             return res.status(400).json({message:"Status is required",
                 success:false
